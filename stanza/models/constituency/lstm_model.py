@@ -114,6 +114,7 @@ class LSTMModel(BaseModel, nn.Module):
         self.reduce_linear = nn.Linear(self.hidden_size * 2, self.hidden_size)
 
         self.tanh = nn.Tanh()
+        self.word_dropout = nn.Dropout(self.args['word_dropout'])
 
         # matrix for predicting the next transition using word/constituent/transition queues
         self.W = nn.Linear(self.hidden_size * 3, len(transitions))
@@ -140,6 +141,7 @@ class LSTMModel(BaseModel, nn.Module):
         tag_input = self.tag_embedding(tag_idx)
 
         word_input = torch.cat([word_input, tag_input])
+        word_input = self.word_dropout(word_input)
         word_input = word_input.unsqueeze(0)
 
         current_node = word_queue.value
